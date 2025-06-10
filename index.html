@@ -470,13 +470,14 @@
         label:  'paypal'
       },
       createOrder: (data, actions) => {
-        return actions.order.create({
-          purchase_units: [{
-            amount: { value: total.toFixed(2)},
-            description: cart.map(item => `${item.quantity}x ${item.name}`).join(', ')
-          }]
-        });
-      },
+    return actions.order.create({
+      purchase_units: [{
+        amount: { value: total.toFixed(2) },
+        // Remove or shorten the description:
+        // description: cart.map(item => `${item.quantity}x ${item.name}`).join(', ')
+      }]
+    });
+  },
       onApprove: (data, actions) => {
         return actions.order.capture().then(details => {
           alert(`Thank you, ${details.payer.name.given_name}! Your payment for your cart was successful.`);
