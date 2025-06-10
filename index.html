@@ -23,9 +23,9 @@
     .logo-area { display: flex; align-items: center; gap: 1rem; }
     .logo-img { height: 84px; width: 84px; object-fit: contain; border-radius: 8px; background: var(--white); padding: 2px; }
     .logo-text { font-size: 1.5rem; font-weight: bold; color: var(--white); }
-    .nav-links { display: flex; gap: 2rem; }
+    .nav-links { display: flex; gap: 0.5rem; }
     .nav-links a { color: var(--white); text-decoration: none; font-weight: 600; transition: opacity 0.2s; }
-    .nav-links a:hover { opacity: 0.8; }
+    .nav-links a:hover { opacity: 0.2; }
     .hero { background: linear-gradient(135deg, var(--secondary-blue), var(--primary-blue)); color: var(--white); padding: 4rem 2rem; text-align: center; margin-bottom: 2rem; border-radius: 0 0 1rem 1rem; }
     .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     .hero p { font-size: 1.2rem; max-width: 800px; margin: 0 auto 2rem; }
@@ -95,7 +95,7 @@
       .products { grid-template-columns: 1fr; }
       .product-card { max-width: 98vw; width: 98vw; }
     }
-    .cart-icon { position: relative; display: inline-block; font-size: 2.5rem; }
+    .cart-icon { position: relative; top: 0px; right: 300px; display: inline-block; font-size: 3rem; }
     .cart-count { position: absolute; top: -8px; right: -8px; background: var(--secondary-blue); color: var(--white); border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: flex; justify-content: center; align-items: center; }
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: center; }
     .modal-content { background: var(--white); border-radius: 1rem; padding: 2rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
@@ -176,7 +176,7 @@
       </div>
       <div id="cart-items"></div>
       <div class="cart-total">
-        Total: $<span id="cart-total">0.00</span>
+        Total: $<span id="cart-total">0.00</span>(+0.34$ fee included)
       </div>
       <div id="paypal-button-container"></div>
     </div>
@@ -291,7 +291,6 @@
         });
       }
       updateCartCount();
-      
     }
     function openCartModal() {
       document.getElementById('cart-modal').style.display = 'flex';
@@ -340,7 +339,7 @@
         cartItemsContainer.appendChild(cartItem);
       });
       document.getElementById('cart-total').textContent = total.toFixed(2);
-      renderPayPalButton(total);
+      renderPayPalButton(total+0.34);
     }
     function renderPayPalButton(total) {
       const paypalContainer = document.getElementById('paypal-button-container');
