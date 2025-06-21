@@ -287,6 +287,7 @@
       background-color: #008f57;
       outline: none;
     }
+    /* Responsive styles */
     @media (max-width: 600px) {
       .header-bar {
         flex-direction: column;
@@ -304,6 +305,39 @@
       }
       .paypal-cart-btn-container {
         max-height: 250px;
+      }
+    }
+    /* Footer styles */
+    .site-footer {
+      background: #0056b3;
+      color: #fff;
+      padding: 1.5rem 0 1.2rem 0;
+      text-align: center;
+      font-size: 1rem;
+      margin-top: 2rem;
+    }
+    .footer-content {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      align-items: center;
+      justify-content: center;
+    }
+    .footer-insta-link {
+      color: #fff;
+      font-weight: bold;
+      text-decoration: underline;
+      transition: color 0.2s;
+    }
+    .footer-insta-link:hover {
+      color: #ffdd57;
+    }
+    @media (max-width: 600px) {
+      .footer-content {
+        font-size: 0.95rem;
+        padding: 0 1rem;
       }
     }
   </style>
@@ -334,6 +368,21 @@
 </div>
 
 <div class="container" id="product-list"></div>
+
+<!-- Footer Section -->
+<footer class="site-footer">
+  <div class="footer-content">
+    <div>
+      <strong>Contact:</strong> support@yourstore.com<br>
+      <strong>Phone:</strong> +94-xxx xxx xxx
+    </div>
+    <div>
+      <a href="https://instagram.com/store_bluewave" target="_blank" rel="noopener" class="footer-insta-link">
+        Follow us on Instagram
+      </a>
+    </div>
+  </div>
+</footer>
 
 <!-- Load PayPal SDK -->
 <script src="https://www.paypal.com/sdk/js?client-id=AQWu9CVpwB_UxE91oFkbNym-d3_C0Wt-qzwYwZsYqwRYlYAB1TZQY5WWGgWcmGQaZgBLGCDdsuvGunuc&currency=USD"></script>
@@ -466,7 +515,6 @@
       productList.appendChild(card);
     });
   }
-
   // Cart Modal Functions
   function openCartModal() {
     renderCartModal();
@@ -527,8 +575,6 @@
     return actions.order.create({
       purchase_units: [{
         amount: { value: total.toFixed(2) },
-        // Remove or shorten the description:
-        // description: cart.map(item => `${item.quantity}x ${item.name}`).join(', ')
       }]
     });
   },
