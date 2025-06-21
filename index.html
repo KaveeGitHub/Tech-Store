@@ -287,24 +287,104 @@
       background-color: #008f57;
       outline: none;
     }
-    /* Responsive styles */
+    /* Review Section Styles */
+    #reviews-section {
+      max-width: 900px;
+      margin: 3rem auto 2rem;
+      background: #f6faff;
+      padding: 1.5rem 2rem;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      border-left: 6px solid #0074D9;
+      border-right: 6px solid #0074D9;
+    }
+    #reviews-section h2 {
+      color: #0056b3;
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    #review-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+      background: #e6f0ff;
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      border: 1px solid #b3d1ff;
+    }
+    #review-form textarea {
+      resize: vertical;
+      min-height: 80px;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #b3d1ff;
+      font-family: inherit;
+    }
+    #review-form input[type="text"] {
+      padding: 0.4rem 0.6rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #b3d1ff;
+      font-family: inherit;
+    }
+    #review-form label {
+      font-weight: 600;
+      color: #0056b3;
+    }
+    #review-form button {
+      align-self: flex-start;
+      background-color: #0056b3;
+      color: white;
+      border: none;
+      padding: 0.55rem 1.2rem;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    #review-form button:hover,
+    #review-form button:focus {
+      background-color: #003d80;
+      outline: none;
+    }
+    #reviews-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    .review-item {
+      border-left: 4px solid #0056b3;
+      padding-left: 1rem;
+      background: #eaf3ff;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .review-item .reviewer-name {
+      font-weight: 700;
+      color: #003d80;
+      margin-bottom: 0.3rem;
+    }
+    .review-item .review-text {
+      font-size: 1rem;
+      color: #222;
+      white-space: pre-wrap;
+    }
+    .review-item .review-date {
+      font-size: 0.92rem;
+      color: #666;
+      margin-top: 0.2rem;
+    }
+    /* Responsive for review section */
     @media (max-width: 600px) {
-      .header-bar {
-        flex-direction: column;
-        gap: 0.5rem;
-        justify-content: center;
-      }
-      .cart-btn {
-        position: static;
-        margin: 0.5rem 0 0 0;
-        font-size: 2rem;
-      }
-      .cart-modal {
-        max-width: 98vw;
-        padding: 1rem 0.2rem;
-      }
-      .paypal-cart-btn-container {
-        max-height: 250px;
+      #reviews-section {
+        margin: 2rem 1rem 2rem;
+        padding: 1rem 1.2rem;
       }
     }
     /* Footer styles */
@@ -369,6 +449,21 @@
 
 <div class="container" id="product-list"></div>
 
+<!-- Reviews Section -->
+<section id="reviews-section" aria-label="Customer Reviews">
+  <h2>Customer Reviews</h2>
+  <form id="review-form" aria-label="Submit a customer review">
+    <label for="reviewer-name">Your Name</label>
+    <input type="text" id="reviewer-name" name="reviewer-name" placeholder="Enter your name" required maxlength="50" />
+    
+    <label for="review-text">Your Review</label>
+    <textarea id="review-text" name="review-text" placeholder="Write your review here..." required minlength="10" maxlength="500"></textarea>
+    
+    <button type="submit">Submit Review</button>
+  </form>
+  <div id="reviews-list" aria-live="polite" aria-relevant="additions"></div>
+</section>
+
 <!-- Footer Section -->
 <footer class="site-footer">
   <div class="footer-content">
@@ -390,102 +485,22 @@
 <script>
   // Product Data
   const products = [
-    {
-      name: "Anti-Theft Bicycle Horn",
-      price: 5.99,
-      description: "Handy gadget for ADVENTUROUS Riders",
-      image: "aba.png"
-    },
-    {
-      name: "Retractable Camping Pole Lighter",
-      price: 16.99,
-      description: "A Must Needed Gadget For Adventurous Campers",
-      image: "rcpl.png"
-    },
-    {
-      name: "Pikachu Night Light",
-      price: 4.99,
-      description: "Safe Sleep With Pikachu Around!",
-      image: "pnl.png"
-    },
-    {
-      name: "Universal Light Pen",
-      price: 2.99,
-      description: "One Pen For All Devices",
-      image: "ulp.png"
-    },
-    {
-      name: "UV Protective Bluetooth Call Headphones AI Translation Smart Glasses",
-      price: 24.99,
-      description: "protection,calling,translation,photography all in one ",
-      image: "sg.png"
-    },
-    {
-      name: "Waterproof Nano Layered SweatShirt",
-      price: 18.99,
-      description: "no more coffee spills for you!",
-      image: "wns.png"
-    },
-     {
-      name: "Vacuum Suction Cup 360° Rotation Magnetic Car Phone Holder",
-      price: 10.99,
-      description: "The best hand to hold your phone!",
-      image: "ph.png"
-    },
-     {
-      name: "10000mAh Waterproof Solar Power Bank With SOS light and compass",
-      price: 21.99,
-      description: "Holds that extra power to boost you up!",
-      image: "wspb.png"
-    },
-    {
-      name: "ShockProof Aluminum Base Bicycle Phone Holder",
-      price: 11.99,
-      description: "The Best Way To Ride while Online",
-      image: "bph.png"
-    },
-    {
-      name: "RGB Smart Home Light (Alexa/Google Assitant Supported)",
-      price: 8.99,
-      description: "Gives A Colorful look To Yuor Room",
-      image: "rgbl.png"
-    },
-    {
-      name: "180ml  Aromatherapy Mist Makeing Mini Air Humidifier with RGB lighting",
-      price: 10.99,
-      description: "It Gives The Look And The Smell!",
-      image: "rgbh.png"
-    },
-    {
-      name: "Motion Dettector Wireless Smart Light",
-      price: 7.99,
-      description: "It Will Turn Your Home Into A Smart Home!",
-      image: "sl.png"
-    },
-    {
-      name: "Auto On/Off Motion Capture Cabinet/Cupboard Smart Light",
-      price: 6.99,
-      description: "It will Light Up Your Cupboard As You Open It!",
-      image: "ssl.png"
-    },
-    {
-      name: " WIFI Smart PIR Motion Movement Detector/Smart Life APP Home Automation System Via Alexa Google Home",
-      price: 13.99,
-      description: "It Is Perfect for Protecting Modern Houses! ",
-      image: "ms.png"
-    },
-    {
-      name: "WiFi Smart Light Switches Touch Switch RF433 No Neutral Wire Smart Home Life via App Control Supports Alexa/Google Home",
-      price: 13.99,
-      description: "Automate Your Home With This!",
-      image: "ss.png"
-    },
-     {
-      name: "2cm*500cm Double-Sided Transparent NanoTape",
-      price: 10.99,
-      description: "A Strong Unnoticable Adhesive To Hold Tightly",
-      image: "nt.png"
-    },
+    { name: "Anti-Theft Bicycle Horn", price: 5.99, description: "Handy gadget for ADVENTUROUS Riders", image: "aba.png" },
+    { name: "Retractable Camping Pole Lighter", price: 16.99, description: "A Must Needed Gadget For Adventurous Campers", image: "rcpl.png" },
+    { name: "Pikachu Night Light", price: 4.99, description: "Safe Sleep With Pikachu Around!", image: "pnl.png" },
+    { name: "Universal Light Pen", price: 2.99, description: "One Pen For All Devices", image: "ulp.png" },
+    { name: "UV Protective Bluetooth Call Headphones AI Translation Smart Glasses", price: 24.99, description: "protection,calling,translation,photography all in one ", image: "sg.png" },
+    { name: "Waterproof Nano Layered SweatShirt", price: 18.99, description: "no more coffee spills for you!", image: "wns.png" },
+    { name: "Vacuum Suction Cup 360° Rotation Magnetic Car Phone Holder", price: 10.99, description: "The best hand to hold your phone!", image: "ph.png" },
+    { name: "10000mAh Waterproof Solar Power Bank With SOS light and compass", price: 21.99, description: "Holds that extra power to boost you up!", image: "wspb.png" },
+    { name: "ShockProof Aluminum Base Bicycle Phone Holder", price: 11.99, description: "The Best Way To Ride while Online", image: "bph.png" },
+    { name: "RGB Smart Home Light (Alexa/Google Assitant Supported)", price: 8.99, description: "Gives A Colorful look To Yuor Room", image: "rgbl.png" },
+    { name: "180ml  Aromatherapy Mist Makeing Mini Air Humidifier with RGB lighting", price: 10.99, description: "It Gives The Look And The Smell!", image: "rgbh.png" },
+    { name: "Motion Dettector Wireless Smart Light", price: 7.99, description: "It Will Turn Your Home Into A Smart Home!", image: "sl.png" },
+    { name: "Auto On/Off Motion Capture Cabinet/Cupboard Smart Light", price: 6.99, description: "It will Light Up Your Cupboard As You Open It!", image: "ssl.png" },
+    { name: " WIFI Smart PIR Motion Movement Detector/Smart Life APP Home Automation System Via Alexa Google Home", price: 13.99, description: "It Is Perfect for Protecting Modern Houses! ", image: "ms.png" },
+    { name: "WiFi Smart Light Switches Touch Switch RF433 No Neutral Wire Smart Home Life via App Control Supports Alexa/Google Home", price: 13.99, description: "Automate Your Home With This!", image: "ss.png" },
+    { name: "2cm*500cm Double-Sided Transparent NanoTape", price: 10.99, description: "A Strong Unnoticable Adhesive To Hold Tightly", image: "nt.png" },
   ];
 
   // Cart State
@@ -663,9 +678,57 @@
     }
   });
 
+  // =========================
+  // Reviews Section JS (Dynamic with Netlify Functions)
+  // =========================
+  async function fetchReviews() {
+    const res = await fetch('/.netlify/functions/get-reviews');
+    const reviews = await res.json();
+    const list = document.getElementById('reviews-list');
+    if (!reviews.length) {
+      list.innerHTML = '<p>No reviews yet. Be the first to review!</p>';
+      return;
+    }
+    list.innerHTML = reviews.map(r => `
+      <div class="review-item">
+        <div class="reviewer-name">${escapeHtml(r.name)}</div>
+        <div class="review-text">${escapeHtml(r.review)}</div>
+        <div class="review-date">${new Date(r.created_at).toLocaleString()}</div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('review-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const name = document.getElementById('reviewer-name').value.trim();
+    const review = document.getElementById('review-text').value.trim();
+
+    if (!name || review.length < 10) {
+      alert('Please enter your name and a review of at least 10 characters.');
+      return;
+    }
+
+    await fetch('/.netlify/functions/add-review', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, review }),
+    });
+
+    this.reset();
+    fetchReviews();
+  });
+
+  // Simple HTML escape to avoid injection
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   // Initial Render
   renderProducts();
   updateCartCountBadge();
+  fetchReviews();
 </script>
 
 </body>
