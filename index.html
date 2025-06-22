@@ -50,7 +50,7 @@
     .quantity-selector .quantity { font-size: 1.1rem; min-width: 20px; text-align: center;}
     button.add-to-cart-btn { background-color: #00b36b; border: none; color: white; font-weight: 600; padding: 0.55rem 1.25rem; font-size: 1rem; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease; user-select: none; margin-top: 0.5rem;}
     button.add-to-cart-btn:hover, button.add-to-cart-btn:focus { background-color: #008f57; outline: none;}
-    #reviews-section { max-width: 900px; margin: 3rem auto 2rem; background: #f6faff; padding: 1.5rem 2rem; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-left: 6px solid #0074D9; border-right: 6px solid #0074D9;}
+    #reviews-section { max-width: 900px; margin: 3rem auto 2rem; background: #f6f0ff; padding: 1.5rem 2rem; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-left: 6px solid #0074D9; border-right: 6px solid #0074D9;}
     #reviews-section h2 { color: #0056b3; margin-bottom: 1rem; font-size: 1.8rem; text-align: center; letter-spacing: 1px;}
     #review-form { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 2rem; background: #e6f0ff; border-radius: 8px; padding: 1rem 1.2rem; border: 1px solid #b3d1ff;}
     #review-form textarea { resize: vertical; min-height: 80px; padding: 0.5rem; font-size: 1rem; border-radius: 6px; border: 1px solid #b3d1ff; font-family: inherit;}
@@ -64,16 +64,18 @@
       justify-content: space-between;
       align-items: center;
       width: 100%;
+      margin-bottom: 0.1em;
     }
     .reviewer-name {
       font-weight: 700;
       color: #003d80;
       text-align: left;
-      flex: 1;
+      font-size: 1.1em;
     }
     .review-stars {
       text-align: right;
       min-width: 120px;
+      font-size: 1.1em;
     }
     .review-stars .star {
       font-size: 1.2em;
@@ -208,7 +210,6 @@
 </footer>
 
 <script src="https://www.paypal.com/sdk/js?client-id=AQWu9CVpwB_UxE91oFkbNym-d3_C0Wt-qzwYwZsYqwRYlYAB1TZQY5WWGgWcmGQaZgBLGCDdsuvGunuc&currency=USD"></script>
-
 <script>
   const products = [
     { name: "Anti-Theft Bicycle Horn", price: 5.99, description: "Handy gadget for ADVENTUROUS Riders", image: "aba.png" },
