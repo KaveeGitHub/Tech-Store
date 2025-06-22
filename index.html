@@ -595,6 +595,8 @@
     { name: " WIFI Smart PIR Motion Movement Detector/Smart Life APP Home Automation System Via Alexa Google Home", price: 13.99, description: "It Is Perfect for Protecting Modern Houses! ", image: "ms.png" },
     { name: "WiFi Smart Light Switches Touch Switch RF433 No Neutral Wire Smart Home Life via App Control Supports Alexa/Google Home", price: 13.99, description: "Automate Your Home With This!", image: "ss.png" },
     { name: "2cm*500cm Double-Sided Transparent NanoTape", price: 10.99, description: "A Strong Unnoticable Adhesive To Hold Tightly", image: "nt.png" },
+    { name: "2/47pcs 3.6V Screwdriver Kit & Foldable Rechargeable Cordless Electric Screwdriver Drill Kit", price: 29.99, description: "It Is A Perfect Multi-Tool For Everyone in any Age", image: "sd.png" },
+
   ];
 
   // Cart State
@@ -651,7 +653,7 @@
     }
     let total = 0;
     cart.forEach((item, idx) => {
-      total += item.price * item.quantity+0.34;
+      total += item.price * item.quantity;
       const row = document.createElement('div');
       row.className = 'cart-item-row';
       row.innerHTML = `
@@ -671,7 +673,7 @@
       `;
       list.appendChild(row);
     });
-    totalRow.textContent = `Total: $${total.toFixed(2)}(+0.34$ fee included)`;
+    totalRow.textContent = `Total: $${total.toFixed(2)}(Shipping Free)`;
     // Render PayPal Smart Button for the cart
     paypal.Buttons({
       style: {
