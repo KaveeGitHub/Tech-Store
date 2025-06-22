@@ -66,9 +66,9 @@
       width: 100%;
     }
     .reviewer-name {
-      text-align: left;
       font-weight: 700;
       color: #003d80;
+      text-align: left;
       flex: 1;
     }
     .review-stars {
@@ -101,7 +101,7 @@
       padding-left: 1rem;
     }
     .star-rating {
-      direction: rtl;
+      direction: ltr;
       display: flex;
       justify-content: flex-start;
       font-size: 2rem;
@@ -156,13 +156,11 @@
   <p>Click “Add to Cart” and checkout from your cart with PayPal<font color="lime">(Shipping Free)</font></p>
 </header>
 
-<!-- Floating Cart Button -->
 <button class="floating-cart-btn" id="open-cart-btn" aria-label="View cart">
   <span class="cart-icon">🛒</span>
   <span class="cart-count-badge" id="cart-count-badge" style="display:none;">0</span>
 </button>
 
-<!-- Cart Modal -->
 <div class="cart-modal-bg" id="cart-modal-bg">
   <div class="cart-modal">
     <button class="cart-modal-close" id="close-cart-modal" aria-label="Close cart">&times;</button>
@@ -175,7 +173,6 @@
 
 <div class="container" id="product-list"></div>
 
-<!-- Reviews Section -->
 <section id="reviews-section" aria-label="Customer Reviews">
   <h2>Customer Reviews</h2>
   <form id="review-form" aria-label="Submit a customer review">
@@ -213,7 +210,6 @@
 <script src="https://www.paypal.com/sdk/js?client-id=AQWu9CVpwB_UxE91oFkbNym-d3_C0Wt-qzwYwZsYqwRYlYAB1TZQY5WWGgWcmGQaZgBLGCDdsuvGunuc&currency=USD"></script>
 
 <script>
-  // Product Data
   const products = [
     { name: "Anti-Theft Bicycle Horn", price: 5.99, description: "Handy gadget for ADVENTUROUS Riders", image: "aba.png" },
     { name: "Retractable Camping Pole Lighter", price: 16.99, description: "A Must Needed Gadget For Adventurous Campers", image: "rcpl.png" },
@@ -234,10 +230,8 @@
     { name: "2/47pcs 3.6V Screwdriver Kit & Foldable Rechargeable Cordless Electric Screwdriver Drill Kit", price: 29.99, description: "It Is A Perfect Multi-Tool For Everyone in any Age", image: "sd.png" }
   ];
 
-  // Cart State
   let cart = [];
 
-  // Renders
   const productList = document.getElementById('product-list');
   function renderProducts() {
     productList.innerHTML = '';
@@ -261,7 +255,6 @@
       productList.appendChild(card);
     });
   }
-  // Cart Modal Functions
   function openCartModal() {
     renderCartModal();
     document.getElementById('cart-modal-bg').style.display = 'flex';
@@ -400,9 +393,6 @@
     }
   });
 
-  // =========================
-  // Reviews Section JS with 5-star system
-  // =========================
   async function fetchReviews() {
     const res = await fetch('/.netlify/functions/get-reviews');
     const reviews = await res.json();
