@@ -59,25 +59,21 @@
     #review-form button { align-self: flex-start; background-color: #0056b3; color: white; border: none; padding: 0.55rem 1.2rem; font-weight: 600; font-size: 1rem; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease; user-select: none;}
     #review-form button:hover, #review-form button:focus { background-color: #003d80; outline: none;}
     #reviews-list { display: flex; flex-direction: column; gap: 1.2rem;}
-    .review-item {
+    .review-item-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-left: 4px solid #0056b3;
-      padding-left: 1rem;
-      background: #eaf3ff;
-      border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-      margin-bottom: 0.2em;
+      width: 100%;
     }
     .reviewer-name {
+      text-align: left;
       font-weight: 700;
       color: #003d80;
-      text-align: left;
+      flex: 1;
     }
     .review-stars {
-      min-width: 7em;
       text-align: right;
+      min-width: 120px;
     }
     .review-stars .star {
       font-size: 1.2em;
@@ -140,7 +136,7 @@
     }
     @media (max-width: 600px) {
       #reviews-section { margin: 2rem 1rem 2rem; padding: 1rem 1.2rem;}
-      .review-item { flex-direction: column; align-items: flex-start;}
+      .review-item-row { flex-direction: column; align-items: flex-start;}
       .review-stars { margin-left: 0; margin-top: 0.3em; text-align: left;}
     }
     .site-footer { background: #0056b3; color: #fff; padding: 1.5rem 0 1.2rem 0; text-align: center; font-size: 1rem; margin-top: 2rem;}
@@ -185,7 +181,7 @@
   <form id="review-form" aria-label="Submit a customer review">
     <label for="reviewer-name">Your Name</label>
     <input type="text" id="reviewer-name" name="reviewer-name" placeholder="Enter your name" required maxlength="50" />
-    <label>Your Rating</label>
+    <label for="star-rating">Your Rating</label>
     <div class="star-rating" id="star-rating">
       <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars" aria-label="5 stars"></label>
       <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars" aria-label="4 stars"></label>
@@ -200,7 +196,6 @@
   <div id="reviews-list" aria-live="polite" aria-relevant="additions"></div>
 </section>
 
-<!-- Footer Section -->
 <footer class="site-footer">
   <div class="footer-content">
     <div>
@@ -215,7 +210,6 @@
   </div>
 </footer>
 
-<!-- Load PayPal SDK -->
 <script src="https://www.paypal.com/sdk/js?client-id=AQWu9CVpwB_UxE91oFkbNym-d3_C0Wt-qzwYwZsYqwRYlYAB1TZQY5WWGgWcmGQaZgBLGCDdsuvGunuc&currency=USD"></script>
 
 <script>
@@ -418,9 +412,9 @@
       return;
     }
     list.innerHTML = reviews.map(r => `
-      <div class="review-item">
-        <div class="reviewer-name">${escapeHtml(r.name)}</div>
-        <div class="review-stars">${renderStars(r.rating)}</div>
+      <div class="review-item-row">
+        <span class="reviewer-name">${escapeHtml(r.name)}</span>
+        <span class="review-stars">${renderStars(r.rating)}</span>
       </div>
       <div class="review-text">${escapeHtml(r.review)}</div>
       <div class="review-date">${new Date(r.created_at).toLocaleString()}</div>
@@ -437,7 +431,7 @@
         stars += `<span class="star empty">★</span>`;
       }
     }
-    return `<span class="review-stars" aria-label="${rating} out of 5 stars">${stars}</span>`;
+    return stars;
   }
 
   document.getElementById('review-form').addEventListener('submit', async function(e) {
