@@ -5,7 +5,9 @@ exports.handler = async function(event, context) {
   await client.connect();
 
   try {
-    const res = await client.query('SELECT name, review, created_at FROM reviews ORDER BY created_at DESC LIMIT 10');
+    const res = await client.query(
+      'SELECT name, review, created_at, rating FROM reviews ORDER BY created_at DESC LIMIT 10'
+    );
     await client.end();
     return {
       statusCode: 200,
@@ -20,4 +22,3 @@ exports.handler = async function(event, context) {
     };
   }
 };
-
