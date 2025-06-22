@@ -5,111 +5,422 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BlueWave Shop - Cart & PayPal Checkout</title>
   <style>
-    body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e6f0ff; color: #222; }
-    header { background-color: #0056b3; color: white; padding: 1.5rem 2rem; text-align: center; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);}
-    header h1 { margin: 0 0 0.3rem; font-weight: 700; letter-spacing: 1.2px; font-size: 2rem;}
-    header p { margin: 0; font-weight: 500; opacity: 0.85; font-size: 1.1rem;}
-    .header-bar { display: flex; align-items: center; justify-content: center; gap: 1rem; position: relative;}
-    .floating-cart-btn { position: fixed; bottom: 32px; right: 32px; width: 60px; height: 60px; background: #fff; border-radius: 50%; box-shadow: 0 4px 16px rgba(0,0,0,0.12); border: none; display: flex; align-items: center; justify-content: center; z-index: 2000; cursor: pointer; transition: box-shadow 0.2s;}
-    .floating-cart-btn:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.18);}
-    .floating-cart-btn .cart-icon { font-size: 2rem; color: #0056b3;}
-    .floating-cart-btn .cart-count-badge { background: #ff3c3c; color: #fff; border-radius: 50%; font-size: 1rem; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-weight: bold; position: absolute; top: 4px; right: 4px; z-index: 1; border: 2px solid #fff; box-sizing: border-box;}
-    @media (max-width: 600px) {
-      .floating-cart-btn { bottom: 16px; right: 16px; width: 50px; height: 50px;}
-      .floating-cart-btn .cart-icon { font-size: 1.5rem;}
-      .floating-cart-btn .cart-count-badge { width: 18px; height: 18px; font-size: 0.85rem;}
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #e6f0ff;
+      color: #222;
     }
-    .cart-modal-bg { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.4); justify-content: center; align-items: flex-start;}
-    .cart-modal { background: #fff; border-radius: 12px; max-width: 400px; width: 95vw; margin-top: 5vh; padding: 1.5rem 1.2rem 1.2rem 1.2rem; box-shadow: 0 8px 24px rgba(0,0,0,0.20); animation: fadeIn 0.2s; position: relative; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column;}
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-30px);} to { opacity: 1; transform: none;} }
-    .cart-modal h2 { margin: 0 0 1rem; font-size: 1.3rem; color: #0056b3;}
-    .cart-items-list { max-height: 300px; overflow-y: auto; margin-bottom: 1rem;}
-    .cart-item-row { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.7rem; border-bottom: 1px solid #e6e6e6; padding-bottom: 0.5rem;}
-    .cart-item-row img { width: 46px; height: 46px; object-fit: contain; background: #f3f3f3; border-radius: 6px;}
-    .cart-item-info { flex: 1; font-size: 1rem;}
-    .cart-item-actions { display: flex; flex-direction: column; gap: 0.2rem; align-items: center; margin-left: 0.3rem;}
-    .cart-item-actions-row { display: flex; gap: 0.3rem; align-items: center;}
-    .cart-qty-btn { background: #007bff; color: #fff; border: none; border-radius: 5px; width: 26px; height: 26px; font-size: 1.15rem; font-weight: bold; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center;}
-    .cart-qty-btn:active, .cart-qty-btn:focus { background: #004a99; }
-    .cart-item-delete { background: none; border: none; color: #d90429; font-size: 1.2rem; cursor: pointer; margin-top: 2px;}
-    .cart-total-row { font-weight: bold; font-size: 1.1rem; text-align: right; margin-bottom: 1rem; color: #0056b3;}
-    .cart-modal-close { background: none; border: none; color: #222; font-size: 1.6rem; position: absolute; top: 1rem; right: 1.3rem; cursor: pointer;}
-    .empty-cart-msg { text-align: center; color: #888; margin: 2rem 0 1rem 0;}
-    .paypal-cart-btn-container { margin-top: 1.5rem; width: 100%; max-height: 350px; overflow-y: auto;}
-    .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;}
-    .product { background: white; border-radius: 12px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); overflow: hidden; display: flex; flex-direction: column; cursor: default; transition: transform 0.25s ease, box-shadow 0.25s ease;}
-    .product:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0, 0, 0, 0.18);}
-    .product img { width: 100%; height: 300px; object-fit: contain; background-color: #f0f0f0; user-select: none; pointer-events: none;}
-    .product-info { padding: 1rem 1.25rem 1.5rem; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;}
-    .product-info h3 { margin: 0 0 0.5rem; font-size: 1.3rem; color: #0056b3;}
-    .product-info p { margin: 0 0 1rem; font-size: 0.95rem; color: #444; flex-grow: 1;}
-    .product-info .price { font-weight: 700; font-size: 1.15rem; color: #007bff; margin-bottom: 1rem;}
-    .quantity-selector { display: flex; align-items: center; justify-content: start; gap: 0.75rem; margin-bottom: 1rem;}
-    .quantity-selector .qty-btn { background-color: #007bff; color: white; border: none; border-radius: 6px; width: 32px; height: 32px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: background-color 0.2s;}
-    .quantity-selector .qty-btn:hover { background-color: #004a99;}
-    .quantity-selector .quantity { font-size: 1.1rem; min-width: 20px; text-align: center;}
-    button.add-to-cart-btn { background-color: #00b36b; border: none; color: white; font-weight: 600; padding: 0.55rem 1.25rem; font-size: 1rem; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease; user-select: none; margin-top: 0.5rem;}
-    button.add-to-cart-btn:hover, button.add-to-cart-btn:focus { background-color: #008f57; outline: none;}
-    #reviews-section { max-width: 900px; margin: 3rem auto 2rem; background: #f6faff; padding: 1.5rem 2rem; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-left: 6px solid #0074D9; border-right: 6px solid #0074D9;}
-    #reviews-section h2 { color: #0056b3; margin-bottom: 1rem; font-size: 1.8rem; text-align: center; letter-spacing: 1px;}
-    #review-form { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 2rem; background: #e6f0ff; border-radius: 8px; padding: 1rem 1.2rem; border: 1px solid #b3d1ff;}
-    #review-form textarea { resize: vertical; min-height: 80px; padding: 0.5rem; font-size: 1rem; border-radius: 6px; border: 1px solid #b3d1ff; font-family: inherit;}
-    #review-form input[type="text"] { padding: 0.4rem 0.6rem; font-size: 1rem; border-radius: 6px; border: 1px solid #b3d1ff; font-family: inherit;}
-    #review-form label { font-weight: 600; color: #0056b3;}
-    #review-form button { align-self: flex-start; background-color: #0056b3; color: white; border: none; padding: 0.55rem 1.2rem; font-weight: 600; font-size: 1rem; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease; user-select: none;}
-    #review-form button:hover, #review-form button:focus { background-color: #003d80; outline: none;}
-    #reviews-list { display: flex; flex-direction: column; gap: 1.2rem;}
-    .review-item-row {
+    header {
+      background-color: #0056b3;
+      color: white;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+    header h1 {
+      margin: 0 0 0.3rem;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      font-size: 2rem;
+    }
+    header p {
+      margin: 0;
+      font-weight: 500;
+      opacity: 0.85;
+      font-size: 1.1rem;
+    }
+    .header-bar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      width: 100%;
+      justify-content: center;
+      gap: 1rem;
+      position: relative;
     }
-    .reviewer-name {
+    /* Floating Cart Button */
+    .floating-cart-btn {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 60px;
+      height: 60px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
+    }
+    .floating-cart-btn:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    }
+    .floating-cart-btn .cart-icon {
+      font-size: 2rem;
+      color: #0056b3;
+    }
+    .floating-cart-btn .cart-count-badge {
+      background: #ff3c3c;
+      color: #fff;
+      border-radius: 50%;
+      font-size: 1rem;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      z-index: 1;
+      border: 2px solid #fff;
+      box-sizing: border-box;
+    }
+    @media (max-width: 600px) {
+      .floating-cart-btn {
+        bottom: 16px;
+        right: 16px;
+        width: 50px;
+        height: 50px;
+      }
+      .floating-cart-btn .cart-icon {
+        font-size: 1.5rem;
+      }
+      .floating-cart-btn .cart-count-badge {
+        width: 18px;
+        height: 18px;
+        font-size: 0.85rem;
+      }
+    }
+    .cart-modal-bg {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.4);
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .cart-modal {
+      background: #fff;
+      border-radius: 12px;
+      max-width: 400px;
+      width: 95vw;
+      margin-top: 5vh;
+      padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.20);
+      animation: fadeIn 0.2s;
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-30px);}
+      to { opacity: 1; transform: none;}
+    }
+    .cart-modal h2 {
+      margin: 0 0 1rem;
+      font-size: 1.3rem;
+      color: #0056b3;
+    }
+    .cart-items-list {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+    }
+    .cart-item-row {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-bottom: 0.7rem;
+      border-bottom: 1px solid #e6e6e6;
+      padding-bottom: 0.5rem;
+    }
+    .cart-item-row img {
+      width: 46px;
+      height: 46px;
+      object-fit: contain;
+      background: #f3f3f3;
+      border-radius: 6px;
+    }
+    .cart-item-info {
+      flex: 1;
+      font-size: 1rem;
+    }
+    .cart-item-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      align-items: center;
+      margin-left: 0.3rem;
+    }
+    .cart-item-actions-row {
+      display: flex;
+      gap: 0.3rem;
+      align-items: center;
+    }
+    .cart-qty-btn {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      width: 26px;
+      height: 26px;
+      font-size: 1.15rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cart-qty-btn:active, .cart-qty-btn:focus { background: #004a99; }
+    .cart-item-delete {
+      background: none;
+      border: none;
+      color: #d90429;
+      font-size: 1.2rem;
+      cursor: pointer;
+      margin-top: 2px;
+    }
+    .cart-total-row {
+      font-weight: bold;
+      font-size: 1.1rem;
+      text-align: right;
+      margin-bottom: 1rem;
+      color: #0056b3;
+    }
+    .cart-modal-close {
+      background: none;
+      border: none;
+      color: #222;
+      font-size: 1.6rem;
+      position: absolute;
+      top: 1rem;
+      right: 1.3rem;
+      cursor: pointer;
+    }
+    .empty-cart-msg {
+      text-align: center;
+      color: #888;
+      margin: 2rem 0 1rem 0;
+    }
+    .paypal-cart-btn-container {
+      margin-top: 1.5rem;
+      width: 100%;
+      max-height: 350px;
+      overflow-y: auto;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .product {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: default;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .product:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.18);
+    }
+    .product img {
+      width: 100%;
+      height: 300px;
+      object-fit: contain;
+      background-color: #f0f0f0;
+      user-select: none;
+      pointer-events: none;
+    }
+    .product-info {
+      padding: 1rem 1.25rem 1.5rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .product-info h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.3rem;
+      color: #0056b3;
+    }
+    .product-info p {
+      margin: 0 0 1rem;
+      font-size: 0.95rem;
+      color: #444;
+      flex-grow: 1;
+    }
+    .product-info .price {
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: #007bff;
+      margin-bottom: 1rem;
+    }
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      justify-content: start;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .quantity-selector .qty-btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      width: 32px;
+      height: 32px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .quantity-selector .qty-btn:hover {
+      background-color: #004a99;
+    }
+    .quantity-selector .quantity {
+      font-size: 1.1rem;
+      min-width: 20px;
+      text-align: center;
+    }
+    button.add-to-cart-btn {
+      background-color: #00b36b;
+      border: none;
+      color: white;
+      font-weight: 600;
+      padding: 0.55rem 1.25rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      user-select: none;
+      margin-top: 0.5rem;
+    }
+    button.add-to-cart-btn:hover,
+    button.add-to-cart-btn:focus {
+      background-color: #008f57;
+      outline: none;
+    }
+    /* Review Section Styles */
+    #reviews-section {
+      max-width: 900px;
+      margin: 3rem auto 2rem;
+      background: #f6faff;
+      padding: 1.5rem 2rem;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      border-left: 6px solid #0074D9;
+      border-right: 6px solid #0074D9;
+    }
+    #reviews-section h2 {
+      color: #0056b3;
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    #review-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+      background: #e6f0ff;
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      border: 1px solid #b3d1ff;
+    }
+    #review-form textarea {
+      resize: vertical;
+      min-height: 80px;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #b3d1ff;
+      font-family: inherit;
+    }
+    #review-form input[type="text"] {
+      padding: 0.4rem 0.6rem;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #b3d1ff;
+      font-family: inherit;
+    }
+    #review-form label {
+      font-weight: 600;
+      color: #0056b3;
+    }
+    #review-form button {
+      align-self: flex-start;
+      background-color: #0056b3;
+      color: white;
+      border: none;
+      padding: 0.55rem 1.2rem;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    #review-form button:hover,
+    #review-form button:focus {
+      background-color: #003d80;
+      outline: none;
+    }
+    #reviews-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    .review-item {
+      border-left: 4px solid #0056b3;
+      padding-left: 1rem;
+      background: #eaf3ff;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .review-item .reviewer-name {
       font-weight: 700;
       color: #003d80;
-      text-align: left;
-      flex: 1;
+      margin-bottom: 0.3rem;
     }
-    .review-stars {
-      text-align: right;
-      min-width: 120px;
-    }
-    .review-stars .star {
-      font-size: 1.2em;
-      margin-right: 0.05em;
-      color: #0074D9;
-      position: relative;
-      display: inline-block;
-      -webkit-text-stroke: 1.2px #0074D9;
-      text-stroke: 1.2px #0074D9;
-    }
-    .review-stars .star.empty {
-      color: transparent;
-    }
-    .review-text {
-      color: #222;
+    .review-item .review-text {
       font-size: 1rem;
-      margin-top: 0.2em;
+      color: #222;
       white-space: pre-wrap;
-      padding-left: 1rem;
     }
-    .review-date {
+    .review-item .review-date {
       font-size: 0.92rem;
       color: #666;
       margin-top: 0.2rem;
-      padding-left: 1rem;
     }
+    /* Star rating input styles */
     .star-rating {
-      direction: ltr;
-      display: flex;
-      justify-content: flex-start;
+      direction: rtl;
+      display: inline-flex;
       font-size: 2rem;
       gap: 0.1em;
-      user-select: none;
       margin-bottom: 0.7rem;
+      user-select: none;
     }
-    .star-rating input[type="radio"] { display: none; }
+    .star-rating input[type="radio"] {
+      display: none;
+    }
     .star-rating label {
       cursor: pointer;
       width: 1.2em;
@@ -134,16 +445,64 @@
       -webkit-text-stroke: 1.2px #0074D9;
       text-stroke: 1.2px #0074D9;
     }
-    @media (max-width: 600px) {
-      #reviews-section { margin: 2rem 1rem 2rem; padding: 1rem 1.2rem;}
-      .review-item-row { flex-direction: column; align-items: flex-start;}
-      .review-stars { margin-left: 0; margin-top: 0.3em; text-align: left;}
+    /* Display stars for reviews */
+    .review-stars {
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 0.3em;
     }
-    .site-footer { background: #0056b3; color: #fff; padding: 1.5rem 0 1.2rem 0; text-align: center; font-size: 1rem; margin-top: 2rem;}
-    .footer-content { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 0.7rem; align-items: center; justify-content: center;}
-    .footer-insta-link { color: #fff; font-weight: bold; text-decoration: underline; transition: color 0.2s;}
-    .footer-insta-link:hover { color: #ffdd57;}
-    @media (max-width: 600px) { .footer-content { font-size: 0.95rem; padding: 0 1rem;}}
+    .review-stars .star {
+      font-size: 1.2em;
+      margin-right: 0.05em;
+      color: #0074D9;
+      position: relative;
+      display: inline-block;
+      -webkit-text-stroke: 1.2px #0074D9;
+      text-stroke: 1.2px #0074D9;
+    }
+    .review-stars .star.empty {
+      color: transparent;
+    }
+    /* Responsive for review section */
+    @media (max-width: 600px) {
+      #reviews-section {
+        margin: 2rem 1rem 2rem;
+        padding: 1rem 1.2rem;
+      }
+    }
+    /* Footer styles */
+    .site-footer {
+      background: #0056b3;
+      color: #fff;
+      padding: 1.5rem 0 1.2rem 0;
+      text-align: center;
+      font-size: 1rem;
+      margin-top: 2rem;
+    }
+    .footer-content {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      align-items: center;
+      justify-content: center;
+    }
+    .footer-insta-link {
+      color: #fff;
+      font-weight: bold;
+      text-decoration: underline;
+      transition: color 0.2s;
+    }
+    .footer-insta-link:hover {
+      color: #ffdd57;
+    }
+    @media (max-width: 600px) {
+      .footer-content {
+        font-size: 0.95rem;
+        padding: 0 1rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -156,11 +515,13 @@
   <p>Click “Add to Cart” and checkout from your cart with PayPal<font color="lime">(Shipping Free)</font></p>
 </header>
 
+<!-- Floating Cart Button -->
 <button class="floating-cart-btn" id="open-cart-btn" aria-label="View cart">
   <span class="cart-icon">🛒</span>
   <span class="cart-count-badge" id="cart-count-badge" style="display:none;">0</span>
 </button>
 
+<!-- Cart Modal -->
 <div class="cart-modal-bg" id="cart-modal-bg">
   <div class="cart-modal">
     <button class="cart-modal-close" id="close-cart-modal" aria-label="Close cart">&times;</button>
@@ -173,12 +534,14 @@
 
 <div class="container" id="product-list"></div>
 
+<!-- Reviews Section -->
 <section id="reviews-section" aria-label="Customer Reviews">
   <h2>Customer Reviews</h2>
   <form id="review-form" aria-label="Submit a customer review">
     <label for="reviewer-name">Your Name</label>
     <input type="text" id="reviewer-name" name="reviewer-name" placeholder="Enter your name" required maxlength="50" />
-    <label for="star-rating">Your Rating</label>
+
+    <label>Your Rating</label>
     <div class="star-rating" id="star-rating">
       <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars" aria-label="5 stars"></label>
       <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars" aria-label="4 stars"></label>
@@ -186,13 +549,16 @@
       <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars" aria-label="2 stars"></label>
       <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star" aria-label="1 star"></label>
     </div>
+
     <label for="review-text">Your Review</label>
     <textarea id="review-text" name="review-text" placeholder="Write your review here..." required minlength="10" maxlength="500"></textarea>
+
     <button type="submit">Submit Review</button>
   </form>
   <div id="reviews-list" aria-live="polite" aria-relevant="additions"></div>
 </section>
 
+<!-- Footer Section -->
 <footer class="site-footer">
   <div class="footer-content">
     <div>
@@ -207,9 +573,11 @@
   </div>
 </footer>
 
+<!-- Load PayPal SDK -->
 <script src="https://www.paypal.com/sdk/js?client-id=AQWu9CVpwB_UxE91oFkbNym-d3_C0Wt-qzwYwZsYqwRYlYAB1TZQY5WWGgWcmGQaZgBLGCDdsuvGunuc&currency=USD"></script>
 
 <script>
+  // Product Data
   const products = [
     { name: "Anti-Theft Bicycle Horn", price: 5.99, description: "Handy gadget for ADVENTUROUS Riders", image: "aba.png" },
     { name: "Retractable Camping Pole Lighter", price: 16.99, description: "A Must Needed Gadget For Adventurous Campers", image: "rcpl.png" },
@@ -227,11 +595,12 @@
     { name: " WIFI Smart PIR Motion Movement Detector/Smart Life APP Home Automation System Via Alexa Google Home", price: 13.99, description: "It Is Perfect for Protecting Modern Houses! ", image: "ms.png" },
     { name: "WiFi Smart Light Switches Touch Switch RF433 No Neutral Wire Smart Home Life via App Control Supports Alexa/Google Home", price: 13.99, description: "Automate Your Home With This!", image: "ss.png" },
     { name: "2cm*500cm Double-Sided Transparent NanoTape", price: 10.99, description: "A Strong Unnoticable Adhesive To Hold Tightly", image: "nt.png" },
-    { name: "2/47pcs 3.6V Screwdriver Kit & Foldable Rechargeable Cordless Electric Screwdriver Drill Kit", price: 29.99, description: "It Is A Perfect Multi-Tool For Everyone in any Age", image: "sd.png" }
   ];
 
+  // Cart State
   let cart = [];
 
+  // Renders
   const productList = document.getElementById('product-list');
   function renderProducts() {
     productList.innerHTML = '';
@@ -255,6 +624,7 @@
       productList.appendChild(card);
     });
   }
+  // Cart Modal Functions
   function openCartModal() {
     renderCartModal();
     document.getElementById('cart-modal-bg').style.display = 'flex';
@@ -281,7 +651,7 @@
     }
     let total = 0;
     cart.forEach((item, idx) => {
-      total += item.price * item.quantity;
+      total += item.price * item.quantity+0.34;
       const row = document.createElement('div');
       row.className = 'cart-item-row';
       row.innerHTML = `
@@ -301,7 +671,8 @@
       `;
       list.appendChild(row);
     });
-    totalRow.textContent = `Total: $${total.toFixed(2)}(Shipping Free)`;
+    totalRow.textContent = `Total: $${total.toFixed(2)}(+0.34$ fee included)`;
+    // Render PayPal Smart Button for the cart
     paypal.Buttons({
       style: {
         layout: 'vertical',
@@ -334,12 +705,15 @@
     }).render(paypalContainer);
   }
 
+  // Product List Event Handling
   productList.addEventListener('click', e => {
+    // Quantity button
     if (e.target.classList.contains('qty-btn')) {
       const action = e.target.getAttribute('data-action');
       const index = e.target.getAttribute('data-index');
       const quantitySpan = document.getElementById(`quantity-${index}`);
       let quantity = parseInt(quantitySpan.textContent);
+
       if (action === 'increase') {
         quantity++;
       } else if (action === 'decrease' && quantity > 1) {
@@ -348,6 +722,8 @@
       quantitySpan.textContent = quantity;
       return;
     }
+
+    // Add to Cart button
     if (e.target.classList.contains('add-to-cart-btn')) {
       const index = parseInt(e.target.getAttribute('data-index'));
       const product = products[index];
@@ -363,12 +739,14 @@
     }
   });
 
+  // Cart Modal Event Handling
   document.getElementById('open-cart-btn').addEventListener('click', openCartModal);
   document.getElementById('close-cart-modal').addEventListener('click', closeCartModal);
   document.getElementById('cart-modal-bg').addEventListener('click', function(e) {
     if (e.target === this) closeCartModal();
   });
   document.getElementById('cart-items-list').addEventListener('click', function(e) {
+    // + and - buttons
     if (e.target.classList.contains('cart-qty-btn')) {
       const idx = parseInt(e.target.getAttribute('data-index'));
       const action = e.target.getAttribute('data-action');
@@ -384,6 +762,7 @@
       updateCartCountBadge();
       return;
     }
+    // delete button
     if (e.target.classList.contains('cart-item-delete')) {
       const idx = parseInt(e.target.getAttribute('data-index'));
       cart.splice(idx, 1);
@@ -393,6 +772,9 @@
     }
   });
 
+  // =========================
+  // Reviews Section JS with 5-star system
+  // =========================
   async function fetchReviews() {
     const res = await fetch('/.netlify/functions/get-reviews');
     const reviews = await res.json();
@@ -402,15 +784,18 @@
       return;
     }
     list.innerHTML = reviews.map(r => `
-      <div class="review-item-row">
-        <span class="reviewer-name">${escapeHtml(r.name)}</span>
-        <span class="review-stars">${renderStars(r.rating)}</span>
+      <div class="review-item">
+        <div class="reviewer-name">
+          ${renderStars(r.rating)}
+          ${escapeHtml(r.name)}
+        </div>
+        <div class="review-text">${escapeHtml(r.review)}</div>
+        <div class="review-date">${new Date(r.created_at).toLocaleString()}</div>
       </div>
-      <div class="review-text">${escapeHtml(r.review)}</div>
-      <div class="review-date">${new Date(r.created_at).toLocaleString()}</div>
     `).join('');
   }
 
+  // Render bluish filled and outlined stars for a given rating (1-5)
   function renderStars(rating) {
     rating = Number(rating) || 0;
     let stars = '';
@@ -421,7 +806,7 @@
         stars += `<span class="star empty">★</span>`;
       }
     }
-    return stars;
+    return `<span class="review-stars" aria-label="${rating} out of 5 stars">${stars}</span>`;
   }
 
   document.getElementById('review-form').addEventListener('submit', async function(e) {
@@ -429,25 +814,30 @@
     const name = document.getElementById('reviewer-name').value.trim();
     const review = document.getElementById('review-text').value.trim();
     const rating = document.querySelector('input[name="rating"]:checked')?.value;
+
     if (!name || review.length < 10 || !rating) {
       alert('Please enter your name, select a star rating, and write a review of at least 10 characters.');
       return;
     }
+
     await fetch('/.netlify/functions/add-review', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, review, rating }),
     });
+
     this.reset();
     fetchReviews();
   });
 
+  // Simple HTML escape to avoid injection
   function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
   }
 
+  // Initial Render
   renderProducts();
   updateCartCountBadge();
   fetchReviews();
