@@ -245,7 +245,6 @@
       object-fit: contain;
       background-color: #f0f0f0;
       user-select: none;
-      pointer-events: none;
     }
     .product-info {
       padding: 1rem 1.25rem 1.5rem;
@@ -503,6 +502,36 @@
         padding: 0 1rem;
       }
     }
+
+.gallery-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+.gallery-overlay img {
+  max-width: 92vw;
+  max-height: 88vh;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+}
+.gallery-overlay .close-btn {
+  position: absolute;
+  top: 32px;
+  right: 44px;
+  font-size: 2.5rem;
+  color: #fff;
+  cursor: pointer;
+  z-index: 1001;
+  background: none;
+  border: none;
+  font-weight: bold;
+}
+
   </style>
 </head>
 <body>
@@ -571,6 +600,10 @@
       </a>
     </div>
   </div>
+  <div style="margin-top:1rem;">
+    <a href="privacy.html" style="color:#fff;text-decoration:underline;">Privacy Policy</a> |
+    <a href="terms.html" style="color:#fff;text-decoration:underline;">Terms & Conditions</a>
+  </div>
 </footer>
 
 <!-- Load PayPal SDK -->
@@ -579,7 +612,7 @@
 <script>
   // Product Data
   const products = [
-    { name: "Anti-Theft Bicycle Horn", price: 5.99, description: "Handy gadget for ADVENTUROUS Riders", image: "aba.png" },
+    { name: "Anti-Theft Bicycle Horn", price: 5.99, description: "Handy gadget for ADVENTUROUS Riders", images: ["aba.png", "sd.png"] },
     { name: "Retractable Camping Pole Lighter", price: 16.99, description: "A Must Needed Gadget For Adventurous Campers", image: "rcpl.png" },
     { name: "Pikachu Night Light", price: 4.99, description: "Safe Sleep With Pikachu Around!", image: "pnl.png" },
     { name: "Universal Light Pen", price: 2.99, description: "One Pen For All Devices", image: "ulp.png" },
@@ -605,27 +638,28 @@
   // Renders
   const productList = document.getElementById('product-list');
   function renderProducts() {
-    productList.innerHTML = '';
-    products.forEach((product, idx) => {
-      const card = document.createElement('article');
-      card.className = 'product';
-      card.innerHTML = `
-        <img src="${product.image}" alt="${product.name}" />
-        <div class="product-info">
-          <h3>${product.name}</h3>
-          <p>${product.description}</p>
-          <div class="price">$${product.price.toFixed(2)}</div>
-          <div class="quantity-selector">
-            <button class="qty-btn" data-action="decrease" data-index="${idx}">−</button>
-            <span id="quantity-${idx}" class="quantity">1</span>
-            <button class="qty-btn" data-action="increase" data-index="${idx}">+</button>
-          </div>
-          <button class="add-to-cart-btn" data-index="${idx}">Add to Cart</button>
+  productList.innerHTML = '';
+  products.forEach((product, idx) => {
+    const card = document.createElement('article');
+    card.className = 'product';
+    card.innerHTML = `
+      <img src="${(product.images ? product.images[0] : product.image)}" alt="${product.name}" class="product-main-img" data-idx="${idx}" data-imgidx="0" style="cursor:pointer;" />
+      <div class="product-info">
+        <h3>${product.name}</h3>
+        <p>${product.description}</p>
+        <div class="price">$${product.price.toFixed(2)}</div>
+        <div class="quantity-selector">
+          <button class="qty-btn" data-action="decrease" data-index="${idx}">−</button>
+          <span id="quantity-${idx}" class="quantity">1</span>
+          <button class="qty-btn" data-action="increase" data-index="${idx}">+</button>
         </div>
-      `;
-      productList.appendChild(card);
-    });
-  }
+        <button class="add-to-cart-btn" data-index="${idx}">Add to Cart</button>
+      </div>
+    `;
+    productList.appendChild(card);
+  });
+}
+
   // Cart Modal Functions
   function openCartModal() {
     renderCartModal();
@@ -843,6 +877,134 @@
   renderProducts();
   updateCartCountBadge();
   fetchReviews();
+
+  // --- GALLERY AUTO-SCROLL & OVERLAY ---
+  // 1. Patch renderProducts to support images array and auto-scroll
+  // 2. Add overlay logic
+
+  // Save original renderProducts
+  const _renderProducts = renderProducts;
+  renderProducts = function() {
+    productList.innerHTML = '';
+    products.forEach((product, idx) => {
+      const imgs = product.images || [product.image];
+      const card = document.createElement('article');
+      card.className = 'product';
+      card.innerHTML = `
+        <img src="${imgs[0]}" alt="${product.name}" class="product-main-img" data-idx="${idx}" data-imgidx="0" style="cursor:pointer;" />
+        <div class="product-info">
+          <h3>${product.name}</h3>
+          <p>${product.description}</p>
+          <div class="price">$${product.price.toFixed(2)}</div>
+          <div class="quantity-selector">
+            <button class="qty-btn" data-action="decrease" data-index="${idx}">−</button>
+            <span id="quantity-${idx}" class="quantity">1</span>
+            <button class="qty-btn" data-action="increase" data-index="${idx}">+</button>
+          </div>
+          <button class="add-to-cart-btn" data-index="${idx}">Add to Cart</button>
+        </div>
+      `;
+      productList.appendChild(card);
+    });
+    setupGalleryAutoscroll();
+  };
+
+  // --------------- GALLERY AUTOSCROLL ---------------
+  let galleryIntervals = [];
+  let galleryIndices = [];
+  function setupGalleryAutoscroll() {
+    // Clear old intervals
+    galleryIntervals.forEach(iv => clearInterval(iv));
+    galleryIntervals = [];
+    galleryIndices = products.map(() => 0);
+
+    products.forEach((product, idx) => {
+      const imgs = product.images || [product.image];
+      const imgEl = document.querySelector(`.product-main-img[data-idx="${idx}"]`);
+      if (imgs.length > 1) {
+        // Auto-scroll
+        galleryIntervals[idx] = setInterval(() => {
+          galleryIndices[idx] = (galleryIndices[idx] + 1) % imgs.length;
+          imgEl.src = imgs[galleryIndices[idx]];
+          imgEl.setAttribute('data-imgidx', galleryIndices[idx]);
+        }, 2000);
+      }
+      // Click to enlarge
+      imgEl.onclick = function() {
+        if (galleryIntervals[idx]) clearInterval(galleryIntervals[idx]);
+        showGalleryOverlay(imgs, galleryIndices[idx], idx);
+      };
+    });
+  }
+
+  // --------------- OVERLAY ---------------
+  // Show overlay with larger image, allow clicking left/right if multiple images
+  function showGalleryOverlay(imgs, imgIdx, prodIdx) {
+    let overlay = document.createElement('div');
+    overlay.className = 'gallery-overlay';
+    overlay.innerHTML = `
+      <button class="close-btn" aria-label="Close overlay">&times;</button>
+      <img src="${imgs[imgIdx]}" style="max-width:92vw;max-height:88vh;border-radius:16px;" />
+      ${imgs.length > 1 ? `
+        <button class="gallery-nav left" style="position:absolute;left:3vw;top:50%;transform:translateY(-50%);font-size:2.5rem;background:none;border:none;color:#fff;cursor:pointer;">&#10094;</button>
+        <button class="gallery-nav right" style="position:absolute;right:3vw;top:50%;transform:translateY(-50%);font-size:2.5rem;background:none;border:none;color:#fff;cursor:pointer;">&#10095;</button>
+      ` : ''}
+    `;
+    document.body.appendChild(overlay);
+
+    function updateOverlayImg() {
+      overlay.querySelector('img').src = imgs[imgIdx];
+    }
+
+    overlay.querySelector('.close-btn').onclick = () => {
+      overlay.remove();
+      // Resume auto-scroll if multiple images
+      if (imgs.length > 1) {
+        galleryIntervals[prodIdx] = setInterval(() => {
+          galleryIndices[prodIdx] = (galleryIndices[prodIdx] + 1) % imgs.length;
+          document.querySelector(`.product-main-img[data-idx="${prodIdx}"]`).src = imgs[galleryIndices[prodIdx]];
+          document.querySelector(`.product-main-img[data-idx="${prodIdx}"]`).setAttribute('data-imgidx', galleryIndices[prodIdx]);
+        }, 2000);
+      }
+    };
+    overlay.onclick = (e) => {
+      if (e.target === overlay) overlay.querySelector('.close-btn').onclick();
+    };
+    if (imgs.length > 1) {
+      overlay.querySelector('.gallery-nav.left').onclick = (e) => {
+        e.stopPropagation();
+        imgIdx = (imgIdx - 1 + imgs.length) % imgs.length;
+        updateOverlayImg();
+      };
+      overlay.querySelector('.gallery-nav.right').onclick = (e) => {
+        e.stopPropagation();
+        imgIdx = (imgIdx + 1) % imgs.length;
+        updateOverlayImg();
+      };
+    }
+  }
+
+  // --- On startup, use the new renderProducts ---
+  renderProducts();
+
+function showOverlay(imgSrc) {
+  // Prevent multiple overlays
+  if (document.querySelector('.gallery-overlay')) return;
+  const overlay = document.createElement('div');
+  overlay.className = 'gallery-overlay';
+  overlay.innerHTML = `
+    <button class="close-btn" aria-label="Close overlay">&times;</button>
+    <img src="${imgSrc}" alt="Enlarged product image" />
+  `;
+  document.body.appendChild(overlay);
+
+  overlay.querySelector('.close-btn').onclick = () => overlay.remove();
+  overlay.onclick = (e) => {
+    if (e.target === overlay) overlay.remove();
+  };
+}
+
+
 </script>
 </body>
 </html>
