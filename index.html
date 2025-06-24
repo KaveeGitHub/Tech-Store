@@ -40,10 +40,10 @@
     /* Floating Cart Button */
     .floating-cart-btn {
       position: fixed;
-      bottom: 32px;
+      top: 32px;
       right: 32px;
-      width: 60px;
-      height: 60px;
+      width: 80px;
+      height: 80px;
       background: #fff;
       border-radius: 50%;
       box-shadow: 0 4px 16px rgba(0,0,0,0.12);
@@ -59,41 +59,41 @@
       box-shadow: 0 8px 24px rgba(0,0,0,0.18);
     }
     .floating-cart-btn .cart-icon {
-      font-size: 2rem;
+      font-size: 3rem;
       color: #0056b3;
     }
     .floating-cart-btn .cart-count-badge {
       background: #ff3c3c;
       color: #fff;
       border-radius: 50%;
-      font-size: 1rem;
-      width: 24px;
-      height: 24px;
+      font-size: 1.4rem;
+      width: 34px;
+      height: 34px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
       position: absolute;
-      top: 4px;
-      right: 4px;
+      top: 8px;
+      right: 8px;
       z-index: 1;
       border: 2px solid #fff;
       box-sizing: border-box;
     }
     @media (max-width: 600px) {
       .floating-cart-btn {
-        bottom: 16px;
+        top: 16px;
         right: 16px;
-        width: 50px;
-        height: 50px;
+        width: 64px;
+        height: 64px;
       }
       .floating-cart-btn .cart-icon {
-        font-size: 1.5rem;
+        font-size: 2.1rem;
       }
       .floating-cart-btn .cart-count-badge {
-        width: 18px;
-        height: 18px;
-        font-size: 0.85rem;
+        width: 24px;
+        height: 24px;
+        font-size: 1.1rem;
       }
     }
     .cart-modal-bg {
@@ -908,8 +908,52 @@
       `;
       productList.appendChild(card);
     });
-    setupGalleryAutoscroll();
+  setupGalleryHoverAutoscroll();
+
   };
+
+function setupGalleryHoverAutoscroll() {
+  products.forEach((product, idx) => {
+    const imgs = product.images || [product.image];
+    const imgEl = document.querySelector(`.product-main-img[data-idx="${idx}"]`);
+    if (!imgEl || imgs.length <= 1) return;
+
+    // Helper to show image
+    function showImage(i) {
+      imgEl.src = imgs[i];
+      imgEl.setAttribute('data-imgidx', i);
+    }
+
+    // Start/stop functions
+    function startScroll() {
+      if (imgEl._interval) clearInterval(imgEl._interval);
+      imgEl._interval = setInterval(() => {
+        let current = parseInt(imgEl.getAttribute('data-imgidx')) || 0;
+        let next = (current + 1) % imgs.length;
+        showImage(next);
+      }, 1500);
+    }
+    function stopScroll() {
+      if (imgEl._interval) clearInterval(imgEl._interval);
+      showImage(0);
+    }
+
+    // Desktop: hover
+    imgEl.addEventListener('mouseenter', startScroll);
+    imgEl.addEventListener('mouseleave', stopScroll);
+
+    // Mobile: touch
+    imgEl.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      startScroll();
+    });
+    imgEl.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      stopScroll();
+    });
+  });
+}
+
 
   // --------------- GALLERY AUTOSCROLL ---------------
   let galleryIntervals = [];
