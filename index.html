@@ -698,7 +698,7 @@ body.cart-modal-open .floating-cart-btn {
       const row = document.createElement('div');
       row.className = 'cart-item-row';
       row.innerHTML = `
-        <img src="${item.image}" alt="${item.name}">
+       <img src="${item.images && Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : item.image}" alt="${item.name}">
         <div class="cart-item-info">
           <div style="font-weight:600;">${item.name}</div>
           <div style="font-size:0.98rem;">$${item.price.toFixed(2)} × ${item.quantity}</div>
@@ -921,41 +921,42 @@ function setupGalleryHoverAutoscroll() {
   products.forEach((product, idx) => {
     const imgs = product.images || [product.image];
     const imgEl = document.querySelector(`.product-main-img[data-idx="${idx}"]`);
-    if (!imgEl || imgs.length <= 1) return;
+    if (!imgEl) return;
 
-    // Helper to show image
-    function showImage(i) {
-      imgEl.src = imgs[i];
-      imgEl.setAttribute('data-imgidx', i);
-    }
-
-    // Start/stop functions
-    function startScroll() {
-      if (imgEl._interval) clearInterval(imgEl._interval);
-      imgEl._interval = setInterval(() => {
-        let current = parseInt(imgEl.getAttribute('data-imgidx')) || 0;
-        let next = (current + 1) % imgs.length;
-        showImage(next);
-      }, 1500);
-    }
-    function stopScroll() {
-      if (imgEl._interval) clearInterval(imgEl._interval);
-      showImage(0);
-    }
-
-    // Desktop: hover
-    imgEl.addEventListener('mouseenter', startScroll);
-    imgEl.addEventListener('mouseleave', stopScroll);
-
-    // Mobile: touch
-    imgEl.addEventListener('touchstart', function(e) {
-      e.preventDefault();
-      startScroll();
+    // Always attach click handler for overlay (works for both single and multi-image)
+    imgEl.addEventListener('click', function() {
+      showGalleryOverlay(imgs, parseInt(imgEl.getAttribute('data-imgidx')) || 0, idx);
     });
-    imgEl.addEventListener('touchend', function(e) {
-      e.preventDefault();
-      stopScroll();
-    });
+
+    // Only attach auto-scroll handlers for multi-image products
+    if (imgs.length > 1) {
+      function showImage(i) {
+        imgEl.src = imgs[i];
+        imgEl.setAttribute('data-imgidx', i);
+      }
+      function startScroll() {
+        if (imgEl._interval) clearInterval(imgEl._interval);
+        imgEl._interval = setInterval(() => {
+          let current = parseInt(imgEl.getAttribute('data-imgidx')) || 0;
+          let next = (current + 1) % imgs.length;
+          showImage(next);
+        }, 1500);
+      }
+      function stopScroll() {
+        if (imgEl._interval) clearInterval(imgEl._interval);
+        showImage(0);
+      }
+      imgEl.addEventListener('mouseenter', startScroll);
+      imgEl.addEventListener('mouseleave', stopScroll);
+      imgEl.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        startScroll();
+      });
+      imgEl.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        stopScroll();
+      });
+    }
   });
 }
 
@@ -1008,16 +1009,22 @@ function setupGalleryHoverAutoscroll() {
     }
 
     overlay.querySelector('.close-btn').onclick = () => {
-      overlay.remove();
-      // Resume auto-scroll if multiple images
-      if (imgs.length > 1) {
-        galleryIntervals[prodIdx] = setInterval(() => {
-          galleryIndices[prodIdx] = (galleryIndices[prodIdx] + 1) % imgs.length;
-          document.querySelector(`.product-main-img[data-idx="${prodIdx}"]`).src = imgs[galleryIndices[prodIdx]];
-          document.querySelector(`.product-main-img[data-idx="${prodIdx}"]`).setAttribute('data-imgidx', galleryIndices[prodIdx]);
-        }, 2000);
-      }
-    };
+  overlay.remove();
+  // Resume auto-scroll if multiple images
+  if (imgs.length > 1) {
+    const imgEl = document.querySelector(`.product-main-img[data-idx="${prodIdx}"]`);
+    if (imgEl) {
+      if (imgEl._interval) clearInterval(imgEl._interval);
+      imgEl._interval = setInterval(() => {
+        let current = parseInt(imgEl.getAttribute('data-imgidx')) || 0;
+        let next = (current + 1) % imgs.length;
+        imgEl.src = imgs[next];
+        imgEl.setAttribute('data-imgidx', next);
+      }, 1500);
+    }
+  }
+};
+
     overlay.onclick = (e) => {
       if (e.target === overlay) overlay.querySelector('.close-btn').onclick();
     };
