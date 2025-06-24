@@ -531,6 +531,9 @@
   border: none;
   font-weight: bold;
 }
+body.cart-modal-open .floating-cart-btn {
+  z-index: 10 !important; /* Lower than the modal's 1000 */
+}
 
   </style>
 </head>
@@ -666,9 +669,11 @@
   function openCartModal() {
     renderCartModal();
     document.getElementById('cart-modal-bg').style.display = 'flex';
+    document.body.classList.add('cart-modal-open');
   }
   function closeCartModal() {
     document.getElementById('cart-modal-bg').style.display = 'none';
+     document.body.classList.remove('cart-modal-open');
   }
   function updateCartCountBadge() {
     const badge = document.getElementById('cart-count-badge');
