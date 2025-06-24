@@ -920,8 +920,9 @@ body.cart-modal-open .floating-cart-btn {
 function setupGalleryHoverAutoscroll() {
   products.forEach((product, idx) => {
     const imgs = product.images || [product.image];
-    const imgEl = document.querySelector(`.product-main-img[data-idx="${idx}"]`);
-    if (!imgEl) return;
+    const card = document.querySelectorAll('.product')[idx];
+    const imgEl = card.querySelector('.product-main-img');
+    if (!imgEl || !card) return;
 
     // Always attach click handler for overlay (works for both single and multi-image)
     imgEl.addEventListener('click', function() {
@@ -946,13 +947,15 @@ function setupGalleryHoverAutoscroll() {
         if (imgEl._interval) clearInterval(imgEl._interval);
         showImage(0);
       }
-      imgEl.addEventListener('mouseenter', startScroll);
-      imgEl.addEventListener('mouseleave', stopScroll);
-      imgEl.addEventListener('touchstart', function(e) {
+      // Desktop: hover on card
+      card.addEventListener('mouseenter', startScroll);
+      card.addEventListener('mouseleave', stopScroll);
+      // Mobile: touch on card
+      card.addEventListener('touchstart', function(e) {
         e.preventDefault();
         startScroll();
       });
-      imgEl.addEventListener('touchend', function(e) {
+      card.addEventListener('touchend', function(e) {
         e.preventDefault();
         stopScroll();
       });
