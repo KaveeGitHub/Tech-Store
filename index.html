@@ -715,6 +715,9 @@ body.cart-modal-open .floating-cart-btn {
       list.appendChild(row);
     });
     totalRow.textContent = `Total: $${total.toFixed(2)} (Free Shipping)`;
+
+    paypalContainer.innerHTML = '<img src="qr.jpg" alt="QR Code" style="width:100%;max-width:200px;margin-bottom:1rem;display:block;margin-left:auto;margin-right:auto;" />';
+
     // Render PayPal Smart Button for the cart
     paypal.Buttons({
       style: {
